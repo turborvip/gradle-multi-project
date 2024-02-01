@@ -1,0 +1,6 @@
+rootProject.name = 'turborjob'
+include 'core'
+include 'api'
+include 'admin'
+//include 'chat'
+
