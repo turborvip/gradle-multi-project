@@ -19,7 +19,7 @@ ecommerce:
   hikariAutoCommit: true
   hikariMaxLifeTime: 1800000 # 30 minute
   hikariConnectionTimeout: 50000
-  hikariMaxPoolSize: 80
+  hikariMaxPoolSize: 50
 
   # hibernate
   hibernateDialect: org.hibernate.dialect.PostgresPlusDialect

@@ -7,15 +7,15 @@ import com.turborvip.core.service.TokenService;
 import com.turborvip.core.service.UserDeviceService;
 import com.turborvip.core.model.entity.*;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -147,27 +147,29 @@ public class JwtService {
                 .compact();
     }
 
-    public boolean validationToken(String token, String publicKey) {
+    public boolean validationToken(String token, String publicKeyString) {
+
         try {
-            Claims claims;
-            claims = Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token).getBody();
+            byte[] publicKeyBytes = Base64.getDecoder().decode(publicKeyString);
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKeyBytes);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PublicKey publicKey = keyFactory.generatePublic(keySpec);
+            Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token).getBody();
             return true;
         } catch (SignatureException exception) {
             log.error("Invalid JWT signature :{}", exception.getMessage());
-            return false;
         } catch (MalformedJwtException exception) {
             log.error("Invalid JWT malformed :{}", exception.getMessage());
-            return false;
         } catch (ExpiredJwtException exception) {
             log.error("JWT token is expired :{}", exception.getMessage());
-            return false;
         } catch (UnsupportedJwtException exception) {
             log.error("JWT token is unsupported :{} ", exception.getMessage());
-            return false;
         } catch (IllegalArgumentException exception) {
             log.error("JWT claims is not empty :{}", exception.getMessage());
-            return true;
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new RuntimeException(e);
         }
+        return false;
     }
 
     public AuthResponse generateTokenFromRefreshToken(String refreshToken, String DEVICE_ID) throws Exception {
