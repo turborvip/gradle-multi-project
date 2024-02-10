@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(STATELESS)
                         .maximumSessions(1)
-                        .maxSessionsPreventsLogin(true))
+                        .maxSessionsPreventsLogin(false))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/v1/both/**").permitAll()

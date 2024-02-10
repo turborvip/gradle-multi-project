@@ -19,7 +19,6 @@ import java.security.spec.X509EncodedKeySpec;
 import java.sql.Timestamp;
 import java.util.*;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -147,29 +146,28 @@ public class JwtService {
                 .compact();
     }
 
-    public boolean validationToken(String token, String publicKeyString) {
-
+    public Claims validationToken(String token, String publicKeyString) {
         try {
-            byte[] publicKeyBytes = Base64.getDecoder().decode(publicKeyString);
-            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKeyBytes);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            PublicKey publicKey = keyFactory.generatePublic(keySpec);
-            Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token).getBody();
-            return true;
+            PublicKey publicKey = generatePublicKey(publicKeyString);
+            return Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token).getBody();
         } catch (SignatureException exception) {
             log.error("Invalid JWT signature :{}", exception.getMessage());
+            throw exception;
         } catch (MalformedJwtException exception) {
             log.error("Invalid JWT malformed :{}", exception.getMessage());
+            throw exception;
         } catch (ExpiredJwtException exception) {
             log.error("JWT token is expired :{}", exception.getMessage());
+            throw exception;
         } catch (UnsupportedJwtException exception) {
             log.error("JWT token is unsupported :{} ", exception.getMessage());
+            throw exception;
         } catch (IllegalArgumentException exception) {
             log.error("JWT claims is not empty :{}", exception.getMessage());
+            throw exception;
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new RuntimeException(e);
         }
-        return false;
     }
 
     public AuthResponse generateTokenFromRefreshToken(String refreshToken, String DEVICE_ID) throws Exception {
@@ -199,6 +197,13 @@ public class JwtService {
         } catch (Exception exception) {
             throw new Exception(exception);
         }
+    }
+
+    private PublicKey generatePublicKey(String publicKeyBase64) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        byte[] publicKeyBytes = Base64.getDecoder().decode(publicKeyBase64);
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        return keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
     }
 
 }
