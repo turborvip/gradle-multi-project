@@ -94,18 +94,11 @@ subprojects {
 	}
 }
 
-project(':api') {
-	dependencies {
-		implementation project(':core')
-	}
-}
-
-project(':admin') {
-	dependencies {
-		implementation project(':core')
-	}
-}
-
+//project(':admin') {
+//	dependencies {
+//		implementation project(':core')
+//	}
+//}
 
 //project(':chat') {
 //	dependencies {

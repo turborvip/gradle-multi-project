@@ -1,0 +1,9 @@
+type Query {
+    device(id: ID): Device
+}
+
+type Device{
+    userAgent: String!,
+    ip: String,
+    status: String
+}

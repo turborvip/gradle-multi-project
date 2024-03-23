@@ -20,3 +20,6 @@ spring:
   output:
     ansi:
       enabled: ALWAYS
+  graphql:
+    graphiql:
+      enabled: true

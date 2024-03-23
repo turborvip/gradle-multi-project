@@ -35,6 +35,7 @@ public class SecurityConfig {
                         .maxSessionsPreventsLogin(false))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/graphiql/**").permitAll()
                         .requestMatchers("/api/v1/both/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/v1/login").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/v1/logout").permitAll()
